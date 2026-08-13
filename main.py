@@ -19,6 +19,9 @@ load_dotenv()
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 TAVILY_ENDPOINT = "https://api.tavily.com/search"
 
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3/search"
+
 # ---- Config ----
 CACHE_TTL_SECONDS = 300          # how long to cache identical queries
 RATE_LIMIT_PER_MINUTE = 20       # requests allowed per IP per minute
@@ -72,8 +75,62 @@ async def search(
     q: str = Query(..., min_length=1, description="Search query"),
     type: str = Query("web", description="Result type: web, images, or news"),
 ):
-    if type not in ("web", "images", "news"):
-        raise HTTPException(status_code=400, detail="type must be 'web', 'images', or 'news'")
+    if type not in ("web", "images", "news", "videos"):
+        raise HTTPException(status_code=400, detail="type must be 'web', 'images', 'news', or 'videos'")
+
+    if type == "videos":
+        if not YOUTUBE_API_KEY:
+            raise HTTPException(
+                status_code=500,
+                detail="Server is not configured with a YOUTUBE_API_KEY. See backend/.env.example.",
+            )
+
+        client_ip = request.client.host if request.client else "unknown"
+        check_rate_limit(client_ip)
+
+        query = q.strip()
+        cache_key = f"videos:{query}"
+        cached = get_cached(cache_key)
+        if cached:
+            return {"query": query, "type": "videos", "cached": True, "results": cached}
+
+        params = {
+            "part": "snippet",
+            "type": "video",
+            "q": query,
+            "maxResults": 10,
+            "videoEmbeddable": "true",
+            "key": YOUTUBE_API_KEY,
+        }
+
+        async with httpx.AsyncClient(timeout=15) as client:
+            try:
+                resp = await client.get(YOUTUBE_ENDPOINT, params=params)
+            except httpx.RequestError as e:
+                raise HTTPException(status_code=502, detail=f"Search provider unreachable: {e}")
+
+        if resp.status_code != 200:
+            raise HTTPException(
+                status_code=resp.status_code,
+                detail=f"Search provider error: {resp.text}",
+            )
+
+        data = resp.json()
+        items = data.get("items", [])
+        normalized = [
+            {
+                "video_id": item.get("id", {}).get("videoId"),
+                "title": item.get("snippet", {}).get("title"),
+                "channel": item.get("snippet", {}).get("channelTitle"),
+                "description": item.get("snippet", {}).get("description"),
+                "thumbnail": item.get("snippet", {}).get("thumbnails", {}).get("medium", {}).get("url"),
+            }
+            for item in items
+            if item.get("id", {}).get("videoId")
+        ]
+
+        set_cache(cache_key, normalized)
+        return {"query": query, "type": "videos", "cached": False, "results": normalized}
 
     if not TAVILY_API_KEY:
         raise HTTPException(
@@ -147,4 +204,8 @@ async def search(
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "api_key_configured": bool(TAVILY_API_KEY)}
+    return {
+        "status": "ok",
+        "tavily_configured": bool(TAVILY_API_KEY),
+        "youtube_configured": bool(YOUTUBE_API_KEY),
+    }
