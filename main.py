@@ -29,10 +29,9 @@ RATE_LIMIT_PER_MINUTE = 20       # requests allowed per IP per minute
 app = FastAPI(title="Nexa Search API")
 
 # Allow your frontend to call this backend.
-# In production, replace "*" with your actual frontend domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://nexa-search.netlify.app"],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
