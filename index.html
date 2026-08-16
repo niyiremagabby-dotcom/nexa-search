@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="icon-192.png?v=2">
+<link rel="apple-touch-icon" href="icon-192.png?v=2">
+<meta name="description" content="Nexa Search — smarter web, image, news and video search in one place. Developed by NIYIREMA Gabby.">
+<meta name="author" content="NIYIREMA Gabby">
+<title>Nexa Search</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+html, body{
+overflow-x:hidden;
+max-width:100%;
+}
+
+:root{
+--accent-1:#ff00c8;
+--accent-2:#7c4dff;
+--accent-1-glow:#ff00c833;
+--accent-2-glow:#7c4dff33;
+--accent-1-shadow:#ff00c888;
+--accent-1-shadow-light:#00e5ff44;
+
+--page-bg:#0b1020;
+--page-text:#ffffff;
+--surface-bg:var(--surface-bg);
+--surface-bg-soft:var(--surface-bg-soft);
+--surface-border:var(--surface-border);
+--panel-bg:#10152f;
+--toolbar-bg:#080b18;
+--muted-text:rgba(255,255,255,.6);
+}
+
+html.light-mode{
+--page-bg:#f4f5fb;
+--page-text:#12131c;
+--surface-bg:rgba(0,0,0,.06);
+--surface-bg-soft:rgba(0,0,0,.045);
+--surface-border:rgba(0,0,0,.12);
+--panel-bg:#ffffff;
+--toolbar-bg:#ffffff;
+--muted-text:rgba(0,0,0,.6);
+}
+
+html, body{
+overflow-x:hidden;
+max-width:100%;
+touch-action:pan-y;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding:100px 20px 60px 20px;
+background:var(--page-bg);
+color:var(--page-text);
+}
+
+.background{
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+background:
+radial-gradient(circle at 20% 20%,var(--accent-1-glow),transparent 30%),
+radial-gradient(circle at 80% 70%,var(--accent-2-glow),transparent 30%),
+linear-gradient(135deg,#050816,#10152f);
+animation:move 12s infinite alternate;
+z-index:0;
+}
+
+html.light-mode .background{
+background:
+radial-gradient(circle at 20% 20%,var(--accent-1-glow),transparent 30%),
+radial-gradient(circle at 80% 70%,var(--accent-2-glow),transparent 30%),
+linear-gradient(135deg,#f4f5fb,#e9eaf5);
+}
+
+@keyframes move{
+from{ transform:scale(1); }
+to{ transform:scale(1.15); }
+}
+
+.container{
+position:relative;
+z-index:2;
+width:min(700px,90%);
+text-align:center;
+}
+
+.logo{
+font-size:80px;
+font-weight:700;
+margin-bottom:10px;
+background:linear-gradient(90deg,var(--accent-1),var(--accent-2));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+opacity:.7;
+margin-bottom:40px;
+}
+
+.search-box{
+display:flex;
+align-items:center;
+background:var(--surface-bg);
+backdrop-filter:blur(18px);
+border:1px solid var(--surface-border);
+border-radius:60px;
+padding:8px;
+transition:.3s;
+}
+
+.search-box:focus-within{
+box-shadow:0 0 25px var(--accent-1-shadow);
+}
+
+input{
+flex:1;
+background:none;
+border:none;
+outline:none;
+color:var(--page-text);
+font-size:18px;
+padding:18px;
+}
+
+input::placeholder{
+color:#aaa;
+}
+
+button{
+border:none;
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+color:var(--page-text);
+padding:16px 28px;
+border-radius:50px;
+cursor:pointer;
+font-size:16px;
+font-weight:600;
+transition:.25s;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
+transform:none;
+}
+
+#refreshButton{
+padding:16px 18px;
+font-size:18px;
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+color:white;
+opacity:.9;
+margin-left:4px;
+}
+
+#refreshButton:hover{
+opacity:1;
+transform:rotate(90deg);
+}
+
+#backButton, #forwardButton{
+background:var(--surface-bg);
+padding:7px 12px;
+font-size:14px;
+border-radius:20px;
+flex-shrink:0;
+}
+
+#backButton:hover:not(:disabled), #forwardButton:hover:not(:disabled){
+background:rgba(255,255,255,.16);
+transform:none;
+}
+
+.footer{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+text-align:center;
+padding:10px 12px;
+background:linear-gradient(90deg,var(--accent-1),var(--accent-2));
+color:var(--page-text);
+opacity:.95;
+font-size:12px;
+font-weight:600;
+z-index:40;
+}
+
+.results{
+margin-top:35px;
+text-align:left;
+}
+
+.result{
+padding:18px;
+margin-bottom:15px;
+background:var(--surface-bg-soft);
+border-radius:16px;
+animation:fade .4s;
+}
+
+.result a{
+color:#7fe7ff;
+text-decoration:none;
+font-size:14px;
+opacity:.8;
+word-break:break-all;
+}
+
+.result h3{
+margin:4px 0 8px 0;
+font-size:18px;
+}
+
+.result h3 a{
+color:var(--page-text);
+font-size:18px;
+opacity:1;
+}
+
+.result p{
+opacity:.75;
+font-size:14px;
+line-height:1.4;
+}
+
+.status{
+margin-top:20px;
+opacity:.6;
+font-size:14px;
+}
+
+.status.error{
+color:#ff8a8a;
+opacity:1;
+}
+
+.tabs{
+display:flex;
+justify-content:center;
+gap:8px;
+margin-top:25px;
+margin-bottom:14px;
+}
+
+.search-wrap{
+position:relative;
+}
+
+.search-wrap > .search-box{
+flex:1;
+}
+
+.history-wrap{
+position:relative;
+flex-shrink:0;
+}
+
+.recent-panel{
+position:absolute;
+top:calc(100% + 10px);
+left:0;
+width:280px;
+background:var(--panel-bg);
+border:1px solid var(--surface-border);
+border-radius:16px;
+overflow:hidden;
+z-index:70;
+display:none;
+text-align:left;
+box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+
+.recent-panel.open{
+display:block;
+}
+
+.recent-panel .recent-header{
+padding:12px 18px;
+font-size:12px;
+opacity:.5;
+text-transform:uppercase;
+letter-spacing:.05em;
+}
+
+.recent-panel .recent-item{
+padding:12px 18px;
+font-size:14px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+}
+
+.recent-panel .recent-item:hover{
+background:var(--surface-bg);
+}
+
+.recent-panel .recent-item .recent-text{
+display:flex;
+align-items:center;
+gap:10px;
+opacity:.85;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.recent-panel .recent-item .delete-recent{
+opacity:.4;
+font-size:13px;
+padding:4px 8px;
+flex-shrink:0;
+}
+
+.recent-panel .recent-item .delete-recent:hover{
+opacity:1;
+color:#ff8a8a;
+}
+
+.recent-panel .recent-empty{
+padding:16px 18px;
+font-size:13px;
+opacity:.5;
+}
+
+#micButton{
+padding:16px 18px;
+font-size:16px;
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+color:white;
+opacity:.9;
+margin-right:4px;
+}
+
+#micButton.listening{
+background:var(--accent-1);
+animation:pulse-glow 1.2s infinite;
+}
+
+#micButton:hover{
+background:rgba(255,255,255,.16);
+transform:none;
+}
+
+.suggestions-dropdown{
+position:absolute;
+top:calc(100% + 6px);
+left:0;
+width:100%;
+background:var(--panel-bg);
+border:1px solid var(--surface-border);
+border-radius:16px;
+overflow:hidden;
+z-index:70;
+display:none;
+text-align:left;
+}
+
+.suggestions-dropdown.open{
+display:block;
+}
+
+.suggestion-item{
+padding:12px 18px;
+font-size:14px;
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:10px;
+opacity:.85;
+}
+
+.suggestion-item:hover{
+background:var(--surface-bg);
+}
+
+.suggestion-item .icon{
+opacity:.5;
+font-size:13px;
+}
+
+.tab{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.15);
+color:#ccc;
+padding:8px 20px;
+border-radius:30px;
+cursor:pointer;
+font-size:14px;
+font-weight:600;
+transition:.2s;
+}
+
+.tab:hover{
+background:rgba(255,255,255,.15);
+}
+
+.tab.active{
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+color:white;
+border-color:transparent;
+}
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:12px;
+margin-top:35px;
+}
+
+.image-card{
+border-radius:14px;
+overflow:hidden;
+background:var(--surface-bg-soft);
+animation:fade .4s;
+cursor:pointer;
+transition:.2s;
+}
+
+.image-card:hover{
+transform:scale(1.03);
+box-shadow:0 0 20px var(--accent-1-shadow-light);
+}
+
+.image-card img{
+width:100%;
+height:140px;
+object-fit:cover;
+display:block;
+background:rgba(255,255,255,.04);
+}
+
+.image-card p{
+padding:8px 10px;
+font-size:12px;
+opacity:.7;
+line-height:1.3;
+}
+
+.result .date{
+opacity:.5;
+font-size:12px;
+margin-bottom:4px;
+}
+
+.modal-overlay{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.75);
+backdrop-filter:blur(6px);
+z-index:100;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.modal-overlay.open{
+display:flex;
+}
+
+.modal-box{
+background:var(--panel-bg);
+border:1px solid var(--surface-border);
+border-radius:20px;
+max-width:600px;
+width:100%;
+max-height:85vh;
+overflow-y:auto;
+text-align:left;
+animation:fade .3s;
+}
+
+.modal-box img{
+width:100%;
+max-height:400px;
+object-fit:contain;
+background:#050816;
+display:block;
+}
+
+.modal-content{
+padding:20px;
+}
+
+.modal-content p{
+opacity:.8;
+line-height:1.5;
+margin-bottom:14px;
+}
+
+.modal-content a{
+color:#7fe7ff;
+text-decoration:none;
+font-size:14px;
+word-break:break-all;
+}
+
+.modal-close{
+position:absolute;
+top:15px;
+right:20px;
+background:rgba(255,255,255,.1);
+border:none;
+color:var(--page-text);
+width:36px;
+height:36px;
+border-radius:50%;
+cursor:pointer;
+font-size:18px;
+z-index:101;
+}
+
+.modal-close:hover{
+background:rgba(255,255,255,.2);
+}
+
+.video-list{
+display:flex;
+flex-direction:column;
+gap:16px;
+margin-top:35px;
+}
+
+.video-row{
+display:flex;
+gap:16px;
+padding:14px;
+background:var(--surface-bg-soft);
+border-radius:16px;
+cursor:pointer;
+transition:.2s;
+animation:fade .4s;
+align-items:flex-start;
+text-align:left;
+}
+
+.video-row:hover{
+background:rgba(255,255,255,.1);
+}
+
+.video-row-thumb{
+position:relative;
+flex-shrink:0;
+width:200px;
+height:112px;
+border-radius:10px;
+overflow:hidden;
+}
+
+.video-row-thumb img{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+background:rgba(255,255,255,.04);
+}
+
+.video-row-info h4{
+font-size:16px;
+margin-bottom:6px;
+line-height:1.35;
+}
+
+.video-row-info p.channel{
+font-size:13px;
+opacity:.65;
+margin-bottom:6px;
+}
+
+.video-row-info p.desc{
+font-size:13px;
+opacity:.55;
+line-height:1.4;
+display:-webkit-box;
+-webkit-line-clamp:2;
+-webkit-box-orient:vertical;
+overflow:hidden;
+}
+
+.player-view{
+text-align:left;
+margin-top:25px;
+}
+
+.player-view .back-btn{
+background:var(--surface-bg);
+border:1px solid var(--surface-border);
+color:var(--page-text);
+padding:8px 18px;
+border-radius:30px;
+cursor:pointer;
+font-size:14px;
+margin-bottom:18px;
+}
+
+.player-view .back-btn:hover{
+background:var(--surface-border);
+}
+
+.player-view iframe{
+width:100%;
+aspect-ratio:16/9;
+border:none;
+border-radius:16px;
+background:#050816;
+display:block;
+}
+
+.player-view h2{
+margin-top:16px;
+font-size:20px;
+}
+
+.player-view p.channel{
+opacity:.6;
+margin-top:6px;
+font-size:14px;
+}
+
+.player-view p.desc{
+opacity:.75;
+margin-top:14px;
+font-size:14px;
+line-height:1.5;
+white-space:pre-line;
+}
+
+.all-view{
+text-align:left;
+margin-top:35px;
+}
+
+.all-section-label{
+font-size:13px;
+font-weight:700;
+opacity:.5;
+text-transform:uppercase;
+letter-spacing:.05em;
+margin:24px 0 10px 0;
+}
+
+.all-section-label:first-child{
+margin-top:0;
+}
+
+.all-image-strip{
+display:flex;
+gap:10px;
+overflow-x:auto;
+padding-bottom:4px;
+}
+
+.all-image-strip img{
+width:110px;
+height:90px;
+object-fit:cover;
+border-radius:12px;
+flex-shrink:0;
+background:rgba(255,255,255,.05);
+}
+
+.modal-box iframe{
+width:100%;
+height:340px;
+border:none;
+display:block;
+background:#050816;
+}
+
+@keyframes fade{
+from{ opacity:0; transform:translateY(10px); }
+to{ opacity:1; transform:translateY(0); }
+}
+@media (max-width: 640px){
+  body{
+    padding:30px 12px;
+    align-items:flex-start;
+  }
+  .logo{
+    font-size:52px;
+  }
+  input{
+    font-size:15px;
+    padding:14px;
+    min-width:0;
+  }
+  #historyButton{
+    padding:12px 12px;
+    font-size:14px;
+  }
+  button{
+    padding:14px 14px;
+    font-size:13px;
+  }
+  #refreshButton{
+    padding:14px 12px;
+    font-size:16px;
+  }
+  .search-box{
+    flex-wrap:nowrap;
+  }
+  .tabs{
+    gap:6px;
+  }
+  .tab{
+    padding:6px 14px;
+    font-size:13px;
+  }
+  .video-row{
+    flex-direction:column;
+  }
+  .video-row-thumb{
+    width:100%;
+    height:auto;
+    aspect-ratio:16/9;
+  }
+  .image-grid{
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  }
+  .modal-box{
+    max-height:92vh;
+  }
+  .modal-box iframe{
+    height:220px;
+  }
+  .player-view iframe{
+    border-radius:10px;
+  }
+}
+
+.logo-row{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:14px;
+margin-top:30px;
+margin-bottom:10px;
+}
+
+.logo-icon{
+width:64px;
+height:64px;
+border-radius:16px;
+}
+
+.mode-toggle-fixed{
+position:fixed;
+top:68px;
+right:20px;
+display:flex;
+gap:6px;
+z-index:55;
+}
+
+.mode-toggle-fixed .mode-btn{
+background:var(--surface-bg);
+border:1px solid var(--surface-border);
+color:var(--page-text);
+padding:9px 14px;
+border-radius:20px;
+font-size:13px;
+cursor:pointer;
+transition:.2s;
+}
+
+.mode-toggle-fixed .mode-btn.active{
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+border-color:transparent;
+}
+
+.mode-toggle-fixed .mode-btn:hover{
+background:rgba(255,255,255,.16);
+}
+
+.install-btn{
+position:fixed;
+top:68px;
+left:20px;
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+border:none;
+color:var(--page-text);
+padding:12px 22px;
+border-radius:30px;
+font-size:14px;
+font-weight:700;
+cursor:pointer;
+z-index:55;
+display:none;
+align-items:center;
+gap:8px;
+box-shadow:0 4px 20px rgba(0,0,0,.35), 0 0 0 0 var(--accent-1-shadow);
+animation:pulse-glow 2.5s infinite;
+transition:transform .2s;
+}
+
+.install-btn:hover{
+transform:scale(1.06);
+}
+
+.install-btn.show{
+display:flex;
+}
+
+.install-btn .icon{
+font-size:16px;
+}
+
+.session-tabs{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+display:flex;
+align-items:center;
+gap:6px;
+padding:10px 12px;
+background:linear-gradient(90deg,var(--accent-1),var(--accent-2));
+z-index:60;
+box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+
+.session-tabs button#backButton,
+.session-tabs button#forwardButton{
+background:rgba(255,255,255,.25);
+border:1px solid rgba(255,255,255,.4);
+color:white;
+width:34px;
+height:34px;
+border-radius:50%;
+font-size:14px;
+cursor:pointer;
+flex-shrink:0;
+transition:.2s;
+}
+
+.session-tabs button#historyButton{
+background:rgba(255,255,255,.25);
+border:1px solid rgba(255,255,255,.4);
+color:white;
+width:42px;
+height:42px;
+border-radius:50%;
+font-size:18px;
+cursor:pointer;
+flex-shrink:0;
+transition:.2s;
+}
+
+.session-tabs button#backButton:hover,
+.session-tabs button#forwardButton:hover,
+.session-tabs button#historyButton:hover{
+background:rgba(255,255,255,.4);
+transform:scale(1.08);
+}
+
+.session-tabs button:disabled{
+opacity:.3;
+cursor:not-allowed;
+}
+
+.session-tabs-list{
+display:flex;
+gap:2px;
+overflow-x:auto;
+flex:1;
+min-width:0;
+}
+
+.session-tab{
+display:flex;
+align-items:center;
+gap:8px;
+padding:9px 14px;
+background:rgba(255,255,255,.05);
+border-radius:10px 10px 0 0;
+font-size:13px;
+white-space:nowrap;
+cursor:pointer;
+opacity:.6;
+max-width:160px;
+}
+
+.session-tab.active{
+background:#0b1020;
+opacity:1;
+}
+
+.session-tab .tab-label{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.session-tab .close-tab{
+opacity:.5;
+font-size:14px;
+padding:0 2px;
+}
+
+.session-tab .close-tab:hover{
+opacity:1;
+}
+
+.new-tab-btn{
+padding:9px 14px;
+background:rgba(255,255,255,.05);
+border-radius:10px 10px 0 0;
+cursor:pointer;
+font-size:15px;
+opacity:.6;
+}
+
+.new-tab-btn:hover{
+opacity:1;
+}
+
+@media (max-width: 640px){
+  .session-tab{
+    max-width:110px;
+    padding:8px 10px;
+    font-size:12px;
+  }
+}
+
+@keyframes pulse-glow{
+0%{ box-shadow:0 4px 20px rgba(0,0,0,.35), 0 0 0 0 var(--accent-1-shadow); }
+70%{ box-shadow:0 4px 20px rgba(0,0,0,.35), 0 0 0 12px transparent; }
+100%{ box-shadow:0 4px 20px rgba(0,0,0,.35), 0 0 0 0 transparent; }
+}
+
+@media (max-width: 640px){
+  .logo-icon{
+    width:44px;
+    height:44px;
+  }
+  .session-tabs{
+    padding:8px 10px;
+    gap:4px;
+  }
+  .session-tabs button#backButton,
+  .session-tabs button#forwardButton{
+    width:30px;
+    height:30px;
+    font-size:12px;
+  }
+  .session-tabs button#historyButton{
+    width:36px;
+    height:36px;
+    font-size:15px;
+  }
+  .recent-panel{
+    width:240px;
+  }
+  .session-tab{
+    max-width:110px;
+    padding:8px 10px;
+    font-size:12px;
+  }
+  .mode-toggle-fixed{
+    top:56px;
+    right:12px;
+  }
+  .mode-toggle-fixed .mode-btn{
+    padding:6px 10px;
+    font-size:11px;
+  }
+  .install-btn{
+    top:56px;
+    left:12px;
+    padding:7px 12px;
+    font-size:11px;
+  }
+  body{
+    padding-top:110px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<div class="session-tabs" id="sessionTabs">
+<button id="backButton" onclick="goBack()" title="Back" disabled>←</button>
+<button id="forwardButton" onclick="goForward()" title="Forward" disabled>→</button>
+<div class="history-wrap">
+<button id="historyButton" onclick="toggleRecentPanel()" title="Recent searches">🕓</button>
+<div class="recent-panel" id="recentPanel"></div>
+</div>
+<div class="session-tabs-list" id="sessionTabsList"></div>
+</div>
+
+<div class="container">
+
+<div class="logo-row">
+<img src="icon-192.png" alt="Nexa logo" class="logo-icon">
+<div class="logo">Nexa</div>
+</div>
+
+<div class="subtitle">Search smarter.</div>
+
+<div class="mode-toggle-fixed" id="modeToggleFixed">
+<button class="mode-btn active" id="darkModeBtn" onclick="setMode('dark')">🌙 Dark</button>
+<button class="mode-btn" id="lightModeBtn" onclick="setMode('light')">☀️ Light</button>
+</div>
+
+<button class="install-btn" id="installBtn" onclick="installApp()"><span class="icon">📲</span> Install App</button>
+
+<div class="search-wrap">
+<div class="search-box">
+<input
+  id="searchInput"
+  placeholder="Search smarter"
+  autocomplete="off"
+/>
+<button id="micButton" onclick="startVoiceSearch()" title="Search by voice">🎤</button>
+<button id="searchButton" onclick="search()">Search</button>
+<button id="refreshButton" onclick="refreshResults()" title="Refresh results">⟳</button>
+</div>
+<div class="suggestions-dropdown" id="suggestionsDropdown"></div>
+</div>
+
+<div class="tabs" id="tabs" style="display:none;">
+<div class="tab active" data-type="all" onclick="switchTab('all')">All</div>
+<div class="tab" data-type="web" onclick="switchTab('web')">Web</div>
+<div class="tab" data-type="images" onclick="switchTab('images')">Images</div>
+<div class="tab" data-type="news" onclick="switchTab('news')">News</div>
+<div class="tab" data-type="videos" onclick="switchTab('videos')">Videos</div>
+</div>
+
+<div class="status" id="status"></div>
+<div class="results" id="results"></div>
+
+<div class="footer">Developed by NIYIREMA Gabby — search the web, images, news &amp; videos in one place</div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+<div class="modal-box" id="modalBox">
+<button class="modal-close" onclick="closeModal()">✕</button>
+<div id="modalMedia"></div>
+<div class="modal-content">
+<p id="modalDescription"></p>
+<a id="modalLink" href="" target="_blank" rel="noopener noreferrer"></a>
+</div>
+</div>
+</div>
+
+<script>
+// Point this at wherever your backend is running.
+// Local dev default: http://127.0.0.1:8000
+const API_BASE = "https://nexa-search.onrender.com";
+
+// Register service worker for offline support and installability
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => {
+      console.log("Service worker registration failed:", err);
+    });
+  });
+}
+
+// Handle the "Install App" button
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.classList.add("show");
+});
+
+function installApp(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    installBtn.classList.remove("show");
+  });
+}
+
+window.addEventListener("appinstalled", () => {
+  installBtn.classList.remove("show");
+});
+
+function setTheme(color1, color2){
+  document.documentElement.style.setProperty('--accent-1', color1);
+  document.documentElement.style.setProperty('--accent-2', color2);
+  document.documentElement.style.setProperty('--accent-1-glow', color1 + '33');
+  document.documentElement.style.setProperty('--accent-2-glow', color2 + '33');
+  document.documentElement.style.setProperty('--accent-1-shadow', color1 + '88');
+  document.documentElement.style.setProperty('--accent-1-shadow-light', color1 + '44');
+}
+
+function setMode(mode){
+  document.getElementById('darkModeBtn').classList.toggle('active', mode === 'dark');
+  document.getElementById('lightModeBtn').classList.toggle('active', mode === 'light');
+  document.documentElement.classList.toggle('light-mode', mode === 'light');
+  localStorage.setItem('nexa-mode', mode);
+}
+
+// Default accent: magenta/purple. Restore saved dark/light mode.
+(function(){
+  setTheme('#ff00c8', '#7c4dff');
+  const savedMode = localStorage.getItem('nexa-mode') || 'dark';
+  setMode(savedMode);
+})();
+
+const input = document.getElementById("searchInput");
+
+// ---- Recent searches (used for suggestions, stored locally per browser) ----
+const RECENT_KEY = "nexa-recent-searches";
+const MAX_RECENT = 8;
+
+function getRecentSearches(){
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentSearch(query){
+  let recent = getRecentSearches().filter(q => q.toLowerCase() !== query.toLowerCase());
+  recent.unshift(query);
+  recent = recent.slice(0, MAX_RECENT);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+}
+
+function showSuggestions(){
+  const dropdown = document.getElementById("suggestionsDropdown");
+  const typed = input.value.trim().toLowerCase();
+
+  // Only show live suggestions while actively typing something —
+  // an empty box uses the dedicated Recent panel (🕓 icon) instead.
+  if(!typed){
+    dropdown.classList.remove("open");
+    return;
+  }
+
+  const recent = getRecentSearches();
+  const matches = recent.filter(q => q.toLowerCase().includes(typed) && q.toLowerCase() !== typed);
+
+  if(matches.length === 0){
+    dropdown.classList.remove("open");
+    return;
+  }
+
+  dropdown.innerHTML = matches.map(q => `
+    <div class="suggestion-item" onclick="useSuggestion('${q.replace(/'/g, "\\'")}')">
+      <span class="icon">🔍</span> ${highlightMatch(q, typed)}
+    </div>
+  `).join("");
+  dropdown.classList.add("open");
+  hideRecentPanel();
+}
+
+function highlightMatch(text, typed){
+  const idx = text.toLowerCase().indexOf(typed);
+  if(idx === -1) return text;
+  return text.slice(0, idx) + "<strong>" + text.slice(idx, idx + typed.length) + "</strong>" + text.slice(idx + typed.length);
+}
+
+function hideSuggestions(){
+  document.getElementById("suggestionsDropdown").classList.remove("open");
+}
+
+function useSuggestion(query){
+  input.value = query;
+  hideSuggestions();
+  search();
+}
+
+function toggleRecentPanel(){
+  const panel = document.getElementById("recentPanel");
+  if(panel.classList.contains("open")){
+    hideRecentPanel();
+  } else {
+    renderRecentPanel();
+    panel.classList.add("open");
+    hideSuggestions();
+  }
+}
+
+function hideRecentPanel(){
+  document.getElementById("recentPanel").classList.remove("open");
+}
+
+function renderRecentPanel(){
+  const panel = document.getElementById("recentPanel");
+  const recent = getRecentSearches();
+
+  if(recent.length === 0){
+    panel.innerHTML = `<div class="recent-empty">No recent searches yet.</div>`;
+    return;
+  }
+
+  panel.innerHTML = `<div class="recent-header">Recent searches</div>` +
+    recent.map(q => `
+      <div class="recent-item">
+        <span class="recent-text" onclick="useSuggestion('${q.replace(/'/g, "\\'")}')">🕓 ${q}</span>
+        <span class="delete-recent" onclick="deleteRecentSearch('${q.replace(/'/g, "\\'")}', event)">✕</span>
+      </div>
+    `).join("");
+}
+
+function deleteRecentSearch(query, event){
+  event.stopPropagation();
+  const recent = getRecentSearches().filter(q => q !== query);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+  renderRecentPanel();
+}
+
+document.addEventListener("click", function(e){
+  const wrap = document.querySelector(".search-wrap");
+  const historyWrap = document.querySelector(".history-wrap");
+  const clickedInsideWrap = wrap && wrap.contains(e.target);
+  const clickedHistoryWrap = historyWrap && historyWrap.contains(e.target);
+
+  if(!clickedInsideWrap && !clickedHistoryWrap){
+    hideSuggestions();
+    hideRecentPanel();
+  }
+});
+
+// ---- Voice search (uses the browser's built-in speech recognition where supported) ----
+function startVoiceSearch(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    alert("Voice search isn't supported in this browser. Try Chrome on Android or desktop.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const micBtn = document.getElementById("micButton");
+  micBtn.classList.add("listening");
+
+  recognition.onresult = function(event){
+    const transcript = event.results[0][0].transcript;
+    input.value = transcript;
+    micBtn.classList.remove("listening");
+    search();
+  };
+
+  recognition.onerror = function(){
+    micBtn.classList.remove("listening");
+  };
+
+  recognition.onend = function(){
+    micBtn.classList.remove("listening");
+  };
+
+  recognition.start();
+}
+const button = document.getElementById("searchButton");
+const results = document.getElementById("results");
+const status = document.getElementById("status");
+const tabs = document.getElementById("tabs");
+const sessionTabsBar = document.getElementById("sessionTabsList");
+
+// ---- Multi-tab session state ----
+let sessions = [];
+let activeSessionId = null;
+let sessionCounter = 0;
+
+function createSession(){
+  sessionCounter++;
+  const session = {
+    id: sessionCounter,
+    query: "",
+    type: "all",
+    imageResults: [],
+    videoResults: [],
+    hasSearched: false,
+    history: [],
+    historyIndex: -1
+  };
+  sessions.push(session);
+  activeSessionId = session.id;
+  renderSessionTabs();
+  renderActiveSession();
+}
+
+function pushHistory(session, query, type){
+  // Drop any "forward" entries if we're navigating from a middle point
+  session.history = session.history.slice(0, session.historyIndex + 1);
+  session.history.push({ query, type });
+  session.historyIndex = session.history.length - 1;
+  updateNavButtons(session);
+}
+
+function updateNavButtons(session){
+  const backBtn = document.getElementById("backButton");
+  const forwardBtn = document.getElementById("forwardButton");
+  backBtn.disabled = !session || session.historyIndex <= 0;
+  forwardBtn.disabled = !session || session.historyIndex >= session.history.length - 1;
+}
+
+function goBack(){
+  const s = getActiveSession();
+  if(!s || s.historyIndex <= 0) return;
+  s.historyIndex--;
+  const entry = s.history[s.historyIndex];
+  s.query = entry.query;
+  s.type = entry.type;
+  input.value = entry.query;
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.type === entry.type);
+  });
+  renderSessionTabs();
+  runSearch(entry.query, entry.type, false);
+  updateNavButtons(s);
+}
+
+function goForward(){
+  const s = getActiveSession();
+  if(!s || s.historyIndex >= s.history.length - 1) return;
+  s.historyIndex++;
+  const entry = s.history[s.historyIndex];
+  s.query = entry.query;
+  s.type = entry.type;
+  input.value = entry.query;
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.type === entry.type);
+  });
+  renderSessionTabs();
+  runSearch(entry.query, entry.type, false);
+  updateNavButtons(s);
+}
+
+function getActiveSession(){
+  return sessions.find(s => s.id === activeSessionId);
+}
+
+function switchSession(id){
+  activeSessionId = id;
+  renderSessionTabs();
+  renderActiveSession();
+  updateNavButtons(getActiveSession());
+}
+
+function closeSession(id, event){
+  event.stopPropagation();
+  const index = sessions.findIndex(s => s.id === id);
+  if(index === -1) return;
+  sessions.splice(index, 1);
+
+  if(sessions.length === 0){
+    createSession();
+    return;
+  }
+
+  if(activeSessionId === id){
+    const newIndex = Math.max(0, index - 1);
+    activeSessionId = sessions[newIndex].id;
+  }
+  renderSessionTabs();
+  renderActiveSession();
+}
+
+function renderSessionTabs(){
+  sessionTabsBar.innerHTML = sessions.map(s => `
+    <div class="session-tab ${s.id === activeSessionId ? 'active' : ''}" onclick="switchSession(${s.id})">
+      <span class="tab-label">${s.query || "New search"}</span>
+      <span class="close-tab" onclick="closeSession(${s.id}, event)">✕</span>
+    </div>
+  `).join("") + `<div class="new-tab-btn" onclick="createSession()">+</div>`;
+}
+
+function renderActiveSession(){
+  const s = getActiveSession();
+  if(!s) return;
+
+  input.value = s.query;
+
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.type === s.type);
+  });
+
+  if(s.hasSearched){
+    tabs.style.display = "flex";
+    runSearch(s.query, s.type, false);
+  } else {
+    tabs.style.display = "none";
+    showHomepageNews();
+  }
+  updateNavButtons(s);
+}
+
+async function showHomepageNews(){
+  results.className = "results";
+  status.className = "status";
+  status.textContent = "Trending around the world";
+  results.innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent("world news today")}&type=news`);
+    const data = await res.json();
+
+    if(res.ok && data.results && data.results.length > 0){
+      results.innerHTML = data.results.slice(0, 8).map(r => `
+        <div class="result">
+          ${r.published_date ? `<div class="date">${r.published_date}</div>` : ""}
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a>
+          <h3><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title || "Untitled"}</a></h3>
+          <p>${r.description || ""}</p>
+        </div>
+      `).join("");
+    } else {
+      status.textContent = "";
+    }
+  } catch (err) {
+    status.textContent = "";
+  }
+}
+
+function openImageModal(index){
+  const s = getActiveSession();
+  const img = s.imageResults[index];
+  if(!img) return;
+
+  document.getElementById("modalMedia").innerHTML = `<img src="${img.url}" alt="${img.description || ''}">`;
+  document.getElementById("modalDescription").textContent = img.description || "No description available.";
+  const link = document.getElementById("modalLink");
+  link.href = img.url;
+  link.textContent = img.url;
+
+  document.getElementById("modalOverlay").classList.add("open");
+}
+
+function openVideoPlayer(index){
+  const s = getActiveSession();
+  const vid = s.videoResults[index];
+  if(!vid) return;
+
+  tabs.style.display = "none";
+  status.textContent = "";
+  results.className = "player-view";
+  results.innerHTML = `
+    <button class="back-btn" onclick="closeVideoPlayer()">&larr; Back to results</button>
+    <iframe src="https://www.youtube.com/embed/${vid.video_id}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <h2>${vid.title || "Untitled"}</h2>
+    <p class="channel">${vid.channel || ""}</p>
+    <p class="desc">${vid.description || ""}</p>
+    <p style="margin-top:14px;"><a href="https://www.youtube.com/watch?v=${vid.video_id}" target="_blank" rel="noopener noreferrer" style="color:#7fe7ff;font-size:13px;">Trouble playing? Open on YouTube</a></p>
+  `;
+}
+
+function closeVideoPlayer(){
+  tabs.style.display = "flex";
+  const s = getActiveSession();
+  runSearch(s.query, "videos", false);
+}
+
+function closeModal(){
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.getElementById("modalMedia").innerHTML = "";
+}
+
+function closeModalOnOverlay(e){
+  if(e.target.id === "modalOverlay"){
+    closeModal();
+  }
+}
+
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape"){
+    closeModal();
+  }
+});
+
+function switchTab(type){
+  const s = getActiveSession();
+  if(!s || type === s.type) return;
+  s.type = type;
+  pushHistory(s, s.query, type);
+
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.type === type);
+  });
+
+  if(s.query){
+    runSearch(s.query, type, false);
+  }
+}
+
+function search(){
+  const query = input.value.trim();
+  if(!query) return;
+  const s = getActiveSession();
+  if(!s) return;
+
+  s.query = query;
+  s.type = "all";
+  s.hasSearched = true;
+  pushHistory(s, query, "all");
+  saveRecentSearch(query);
+  hideSuggestions();
+  hideRecentPanel();
+
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.type === "all");
+  });
+
+  renderSessionTabs();
+
+  const devPatterns = ["who developed nexa", "who made nexa", "who created nexa", "who built nexa", "who is the developer of nexa"];
+  if(devPatterns.some(p => query.toLowerCase().includes(p))){
+    showDeveloperAnswer(query);
+    return;
+  }
+
+  runSearch(query, "all", false);
+}
+
+function showDeveloperAnswer(query){
+  tabs.style.display = "none";
+  status.className = "status";
+  status.textContent = `Result for "${query}"`;
+  results.className = "results";
+  results.innerHTML = `
+    <div class="result">
+      <h3>NIYIREMA Gabby</h3>
+      <p>Nexa Search was developed by NIYIREMA Gabby — a search engine for the web, images, news, and videos, all in one place.</p>
+    </div>
+  `;
+}
+
+function refreshResults(){
+  const s = getActiveSession();
+  if(!s || !s.query){
+    window.location.reload();
+    return;
+  }
+  runSearch(s.query, s.type, false);
+}
+
+async function runSearch(query, type, updateSessionMeta = true){
+  const s = getActiveSession();
+  if(s && updateSessionMeta){
+    s.query = query;
+    s.type = type;
+    s.hasSearched = true;
+    renderSessionTabs();
+  }
+
+  if(type === "all"){
+    return runAllSearch(query, s);
+  }
+
+  button.disabled = true;
+  tabs.style.display = "flex";
+  status.className = "status";
+  status.textContent = "Searching...";
+  results.innerHTML = "";
+  results.className = "results";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}&type=${type}`);
+    const data = await res.json();
+
+    if(!res.ok){
+      throw new Error(data.detail || "Search failed");
+    }
+
+    if(!data.results || data.results.length === 0){
+      status.textContent = `No ${type} results for "${query}".`;
+      return;
+    }
+
+    status.textContent = data.cached
+      ? `${capitalize(type)} results for "${query}" (cached)`
+      : `${capitalize(type)} results for "${query}"`;
+
+    if(type === "images"){
+      results.className = "image-grid";
+      results.innerHTML = data.results.map((r, i) => `
+        <div class="image-card" onclick="openImageModal(${i})">
+          <img src="${r.url}" alt="${r.description || ''}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22140%22><rect width=%22160%22 height=%22140%22 fill=%22%23222738%22/><text x=%2280%22 y=%2270%22 font-size=%2212%22 fill=%22%23888%22 text-anchor=%22middle%22>Image unavailable</text></svg>'">
+          ${r.description ? `<p>${r.description}</p>` : ""}
+        </div>
+      `).join("");
+      if(s) s.imageResults = data.results;
+    } else if(type === "videos"){
+      results.className = "video-list";
+      results.innerHTML = data.results.map((r, i) => `
+        <div class="video-row" onclick="openVideoPlayer(${i})">
+          <div class="video-row-thumb">
+            <img src="${r.thumbnail || ''}" alt="${r.title || ''}" loading="lazy">
+          </div>
+          <div class="video-row-info">
+            <h4>${r.title || "Untitled"}</h4>
+            <p class="channel">${r.channel || ""}</p>
+            <p class="desc">${r.description || ""}</p>
+          </div>
+        </div>
+      `).join("");
+      if(s) s.videoResults = data.results;
+    } else {
+      results.className = "results";
+      results.innerHTML = data.results.map(r => `
+        <div class="result">
+          ${r.published_date ? `<div class="date">${r.published_date}</div>` : ""}
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a>
+          <h3><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title || "Untitled"}</a></h3>
+          <p>${r.description || ""}</p>
+        </div>
+      `).join("");
+    }
+
+  } catch (err) {
+    status.className = "status error";
+    status.textContent = `Error: ${err.message}`;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function capitalize(s){
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+async function runAllSearch(query, s){
+  button.disabled = true;
+  tabs.style.display = "flex";
+  status.className = "status";
+  status.textContent = "Searching...";
+  results.innerHTML = "";
+  results.className = "all-view";
+
+  try {
+    const [webRes, imgRes, newsRes, vidRes] = await Promise.allSettled([
+      fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}&type=web`).then(r => r.json()),
+      fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}&type=images`).then(r => r.json()),
+      fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}&type=news`).then(r => r.json()),
+      fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}&type=videos`).then(r => r.json()),
+    ]);
+
+    status.textContent = `Results for "${query}"`;
+
+    let html = "";
+
+    const images = imgRes.status === "fulfilled" ? (imgRes.value.results || []) : [];
+    if(images.length > 0){
+      html += `<div class="all-section-label">Images</div>`;
+      html += `<div class="all-image-strip">` + images.slice(0, 6).map(r => `
+        <img src="${r.url}" alt="${r.description || ''}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+      `).join("") + `</div>`;
+      if(s) s.imageResults = images;
+    }
+
+    const videos = vidRes.status === "fulfilled" ? (vidRes.value.results || []) : [];
+    if(videos.length > 0){
+      const v = videos[0];
+      html += `<div class="all-section-label">Videos</div>`;
+      html += `<div class="video-row" onclick="switchTab('videos'); setTimeout(() => openVideoPlayer(0), 50)">
+        <div class="video-row-thumb"><img src="${v.thumbnail || ''}" alt="${v.title || ''}" loading="lazy"></div>
+        <div class="video-row-info">
+          <h4>${v.title || "Untitled"}</h4>
+          <p class="channel">${v.channel || ""}</p>
+        </div>
+      </div>`;
+      if(s) s.videoResults = videos;
+    }
+
+    const news = newsRes.status === "fulfilled" ? (newsRes.value.results || []) : [];
+    if(news.length > 0){
+      html += `<div class="all-section-label">News</div>`;
+      html += news.slice(0, 3).map(r => `
+        <div class="result">
+          ${r.published_date ? `<div class="date">${r.published_date}</div>` : ""}
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a>
+          <h3><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title || "Untitled"}</a></h3>
+          <p>${r.description || ""}</p>
+        </div>
+      `).join("");
+    }
+
+    const web = webRes.status === "fulfilled" ? (webRes.value.results || []) : [];
+    if(web.length > 0){
+      html += `<div class="all-section-label">Web</div>`;
+      html += web.map(r => `
+        <div class="result">
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a>
+          <h3><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title || "Untitled"}</a></h3>
+          <p>${r.description || ""}</p>
+        </div>
+      `).join("");
+    }
+
+    if(!html){
+      status.textContent = `No results for "${query}".`;
+    }
+
+    results.innerHTML = html;
+
+  } catch (err) {
+    status.className = "status error";
+    status.textContent = `Error: ${err.message}`;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+input.addEventListener("keypress", function(e){
+  if(e.key === "Enter"){
+    search();
+  }
+});
+
+input.addEventListener("input", showSuggestions);
+
+// Start with one open session
+createSession();
+</script>
+
+</body>
+</html>
