@@ -85,6 +85,13 @@ animation:move 12s infinite alternate;
 z-index:0;
 }
 
+html.light-mode .background{
+background:
+radial-gradient(circle at 20% 20%,var(--accent-1-glow),transparent 30%),
+radial-gradient(circle at 80% 70%,var(--accent-2-glow),transparent 30%),
+linear-gradient(135deg,#f4f5fb,#e9eaf5);
+}
+
 @keyframes move{
 from{ transform:scale(1); }
 to{ transform:scale(1.15); }
