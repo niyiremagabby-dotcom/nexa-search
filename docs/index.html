@@ -269,11 +269,16 @@ position:relative;
 flex:1;
 }
 
+.history-wrap{
+position:relative;
+flex-shrink:0;
+}
+
 .recent-panel{
 position:absolute;
-top:calc(100% + 6px);
+top:calc(100% + 10px);
 left:0;
-width:100%;
+width:280px;
 background:var(--panel-bg);
 border:1px solid var(--surface-border);
 border-radius:16px;
@@ -281,6 +286,7 @@ overflow:hidden;
 z-index:70;
 display:none;
 text-align:left;
+box-shadow:0 8px 24px rgba(0,0,0,.35);
 }
 
 .recent-panel.open{
@@ -394,8 +400,8 @@ font-size:13px;
 }
 
 .tab{
-background:var(--surface-bg-soft);
-border:1px solid var(--surface-border);
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.15);
 color:#ccc;
 padding:8px 20px;
 border-radius:30px;
@@ -406,12 +412,12 @@ transition:.2s;
 }
 
 .tab:hover{
-background:var(--surface-border);
+background:rgba(255,255,255,.15);
 }
 
 .tab.active{
 background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
-color:var(--page-text);
+color:white;
 border-color:transparent;
 }
 
@@ -832,14 +838,13 @@ display:flex;
 align-items:center;
 gap:6px;
 padding:10px 12px;
-background:var(--toolbar-bg);
+background:#080b18;
 z-index:60;
 box-shadow:0 2px 10px rgba(0,0,0,.3);
 }
 
 .session-tabs button#backButton,
-.session-tabs button#forwardButton,
-.session-tabs button#historyButton{
+.session-tabs button#forwardButton{
 background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
 border:none;
 color:white;
@@ -847,6 +852,20 @@ width:34px;
 height:34px;
 border-radius:50%;
 font-size:14px;
+cursor:pointer;
+flex-shrink:0;
+transition:.2s;
+opacity:.9;
+}
+
+.session-tabs button#historyButton{
+background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+border:none;
+color:white;
+width:42px;
+height:42px;
+border-radius:50%;
+font-size:18px;
 cursor:pointer;
 flex-shrink:0;
 transition:.2s;
@@ -888,7 +907,7 @@ max-width:160px;
 }
 
 .session-tab.active{
-background:var(--page-bg);
+background:#0b1020;
 opacity:1;
 }
 
@@ -945,11 +964,18 @@ opacity:1;
     gap:4px;
   }
   .session-tabs button#backButton,
-  .session-tabs button#forwardButton,
-  .session-tabs button#historyButton{
+  .session-tabs button#forwardButton{
     width:30px;
     height:30px;
     font-size:12px;
+  }
+  .session-tabs button#historyButton{
+    width:36px;
+    height:36px;
+    font-size:15px;
+  }
+  .recent-panel{
+    width:240px;
   }
   .session-tab{
     max-width:110px;
@@ -984,7 +1010,10 @@ opacity:1;
 <div class="session-tabs" id="sessionTabs">
 <button id="backButton" onclick="goBack()" title="Back" disabled>←</button>
 <button id="forwardButton" onclick="goForward()" title="Forward" disabled>→</button>
+<div class="history-wrap">
 <button id="historyButton" onclick="toggleRecentPanel()" title="Recent searches">🕓</button>
+<div class="recent-panel" id="recentPanel"></div>
+</div>
 <div class="session-tabs-list" id="sessionTabsList"></div>
 </div>
 
@@ -1008,7 +1037,7 @@ opacity:1;
 <div class="search-box">
 <input
   id="searchInput"
-  placeholder="Search anything..."
+  placeholder="Search smarter"
   autocomplete="off"
 />
 <button id="micButton" onclick="startVoiceSearch()" title="Search by voice">🎤</button>
@@ -1016,7 +1045,6 @@ opacity:1;
 <button id="refreshButton" onclick="refreshResults()" title="Refresh results">⟳</button>
 </div>
 <div class="suggestions-dropdown" id="suggestionsDropdown"></div>
-<div class="recent-panel" id="recentPanel"></div>
 </div>
 
 <div class="tabs" id="tabs" style="display:none;">
@@ -1212,11 +1240,11 @@ function deleteRecentSearch(query, event){
 
 document.addEventListener("click", function(e){
   const wrap = document.querySelector(".search-wrap");
-  const historyBtn = document.getElementById("historyButton");
+  const historyWrap = document.querySelector(".history-wrap");
   const clickedInsideWrap = wrap && wrap.contains(e.target);
-  const clickedHistoryBtn = historyBtn && historyBtn.contains(e.target);
+  const clickedHistoryWrap = historyWrap && historyWrap.contains(e.target);
 
-  if(!clickedInsideWrap && !clickedHistoryBtn){
+  if(!clickedInsideWrap && !clickedHistoryWrap){
     hideSuggestions();
     hideRecentPanel();
   }
