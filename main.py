@@ -31,7 +31,7 @@ app = FastAPI(title="Nexa Search API")
 # Allow your frontend to call this backend.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nexa-search.netlify.app"],
+    allow_origins=["https://nexa-search.netlify.app", "https://niyiremagabby-dotcom.github.io", "http://127.0.0.1:5500", "http://localhost:5500"],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
