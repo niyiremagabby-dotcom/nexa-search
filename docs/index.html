@@ -276,15 +276,10 @@ position:relative;
 flex:1;
 }
 
-.history-wrap{
-position:relative;
-flex-shrink:0;
-}
-
 .recent-panel{
 position:absolute;
-top:calc(100% + 10px);
-left:0;
+top:70px;
+left:90px;
 width:280px;
 background:var(--panel-bg);
 border:1px solid var(--surface-border);
@@ -852,26 +847,27 @@ box-shadow:0 2px 10px rgba(0,0,0,.3);
 
 .session-tabs button#backButton,
 .session-tabs button#forwardButton{
-background:rgba(255,255,255,.25);
-border:1px solid rgba(255,255,255,.4);
-color:white;
+background:rgba(255,255,255,.7);
+border:1px solid rgba(255,255,255,.9);
+color:#12131c;
 width:34px;
 height:34px;
 border-radius:50%;
 font-size:14px;
+font-weight:700;
 cursor:pointer;
 flex-shrink:0;
 transition:.2s;
 }
 
 .session-tabs button#historyButton{
-background:rgba(255,255,255,.25);
-border:1px solid rgba(255,255,255,.4);
-color:white;
-width:42px;
-height:42px;
+background:rgba(255,255,255,.7);
+border:1px solid rgba(255,255,255,.9);
+color:#12131c;
+width:50px;
+height:50px;
 border-radius:50%;
-font-size:18px;
+font-size:20px;
 cursor:pointer;
 flex-shrink:0;
 transition:.2s;
@@ -902,17 +898,19 @@ display:flex;
 align-items:center;
 gap:8px;
 padding:9px 14px;
-background:rgba(255,255,255,.05);
+background:rgba(255,255,255,.15);
+color:#ffffff;
 border-radius:10px 10px 0 0;
 font-size:13px;
 white-space:nowrap;
 cursor:pointer;
-opacity:.6;
+opacity:.75;
 max-width:160px;
 }
 
 .session-tab.active{
-background:#0b1020;
+background:rgba(255,255,255,.35);
+color:#ffffff;
 opacity:1;
 }
 
@@ -975,12 +973,14 @@ opacity:1;
     font-size:12px;
   }
   .session-tabs button#historyButton{
-    width:36px;
-    height:36px;
-    font-size:15px;
+    width:42px;
+    height:42px;
+    font-size:17px;
   }
   .recent-panel{
     width:240px;
+    top:60px;
+    left:70px;
   }
   .session-tab{
     max-width:110px;
@@ -1015,10 +1015,8 @@ opacity:1;
 <div class="session-tabs" id="sessionTabs">
 <button id="backButton" onclick="goBack()" title="Back" disabled>←</button>
 <button id="forwardButton" onclick="goForward()" title="Forward" disabled>→</button>
-<div class="history-wrap">
 <button id="historyButton" onclick="toggleRecentPanel()" title="Recent searches">🕓</button>
 <div class="recent-panel" id="recentPanel"></div>
-</div>
 <div class="session-tabs-list" id="sessionTabsList"></div>
 </div>
 
@@ -1245,11 +1243,13 @@ function deleteRecentSearch(query, event){
 
 document.addEventListener("click", function(e){
   const wrap = document.querySelector(".search-wrap");
-  const historyWrap = document.querySelector(".history-wrap");
+  const historyBtn = document.getElementById("historyButton");
+  const recentPanel = document.getElementById("recentPanel");
   const clickedInsideWrap = wrap && wrap.contains(e.target);
-  const clickedHistoryWrap = historyWrap && historyWrap.contains(e.target);
+  const clickedHistoryBtn = historyBtn && historyBtn.contains(e.target);
+  const clickedRecentPanel = recentPanel && recentPanel.contains(e.target);
 
-  if(!clickedInsideWrap && !clickedHistoryWrap){
+  if(!clickedInsideWrap && !clickedHistoryBtn && !clickedRecentPanel){
     hideSuggestions();
     hideRecentPanel();
   }
